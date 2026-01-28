@@ -1,15 +1,37 @@
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# Load tickets
+issues = []
+categories = []
+responses = []
 
-data = pd.read_csv("tickets.csv")
+with open("tickets.txt", "r") as file:
+    for line in file:
+        category, issue, response = line.strip().split("|")
+        categories.append(category)
+        issues.append(issue.lower())
+        responses.append(response)
 
-vectorizer = TfidfVectorizer(stop_words='english')
-X = vectorizer.fit_transform(data['ticket'])
+# Compare words
+def similarity(user_issue, old_issue):
+    user_words = set(user_issue.lower().split())
+    old_words = set(old_issue.split())
+    return len(user_words & old_words)
 
-def resolve_ticket(new_ticket):
-    new_vec = vectorizer.transform([new_ticket])
-    similarity = cosine_similarity(new_vec, X)
-    best_match = similarity.argmax()
+# Find best match
+def resolve_issue(user_input):
+    best_score = 0
+    best_index = 0
+    for i in range(len(issues)):
+        score = similarity(user_input, issues[i])
+        if score > best_score:
+            best_score = score
+            best_index = i
+    return categories[best_index], responses[best_index]
 
-    return data.iloc[best_match]['category'], data.iloc[best_match]['response']
+# Run program
+print("AI Customer Support Agent")
+user_input = input("Enter customer issue: ")
+
+category, reply = resolve_issue(user_input)
+
+print("\nCategory:", category)
+print("Response:", reply)
