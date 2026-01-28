@@ -1,0 +1,3 @@
+Billing|I was charged twice|We are checking your billing issue.
+Technical|Internet not working|Please restart your router.
+Account|Forgot my password|Use the password reset option.
